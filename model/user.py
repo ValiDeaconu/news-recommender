@@ -17,6 +17,10 @@ class User(db.Model):
         self.password = password
         self.mutation_rate = mutation_rate
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
     @staticmethod
     def find_by_id(id: int):
         return User.query.get(id)

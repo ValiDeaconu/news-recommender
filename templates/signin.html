@@ -1,0 +1,51 @@
+{% include 'header.html' %}
+<!-- Wrapper -->
+<div id="wrapper">
+
+    {% include 'navbar.html' %}
+
+    <!-- Main -->
+    <div id="main">
+        <section>
+            <header class="major">
+                <h1>Autentifica-te în platformă</h1>
+                <span class="date"></span>
+                <p>Pentru a accesa propriile preferințe în platformă, trebuie să te autentifici.</p>
+            </header>
+
+            
+			{% if user_does_not_exist is defined %}
+                <p class='failure-message'>Nu a fost găsit niciun utilizator cu datele introduse.</p>
+            {% endif %}
+
+            {% for field, errors in form.errors.items() %}
+                {% for err in errors %}
+                    <p class='failure-message'>
+                        {{ err }}
+                    </p>
+                {% endfor %}
+            {% endfor %}
+
+            <form method="POST">
+                {{ form.csrf_token }}
+                
+                <div class="fields">
+                    <div class="field">
+                        <label for="username">Nume de utilizator</label>
+                        {{ form.username }}
+                    </div>
+                    <div class="field">
+                        <label for="password">Parolă</label>
+                        {{ form.password }}
+                    </div>
+                </div>
+                <ul class="actions content-center">
+                    <li><input type="submit" value="Trimite" /></li>
+                </ul>
+            </form>
+        </section>
+    </div>
+    {% include 'outro.html' %}
+
+</div>
+{% include 'footer.html' %}

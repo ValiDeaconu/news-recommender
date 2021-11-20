@@ -14,6 +14,10 @@ class UserCategory(db.Model):
         self.user_id = user_id
         self.category = category
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
     @staticmethod
     def find_all_by_user_id(user_id: int):
         return UserCategory.query.filter(UserCategory.user_id == user_id).all()

@@ -16,6 +16,10 @@ class UserKeyword(db.Model):
         self.user_id = user_id
         self.keyword = keyword
         self.liked = liked
+    
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 
     @staticmethod
     def find_all_liked_by_user_id(user_id: int):

@@ -11,13 +11,28 @@
         <li><a href="/elements">Elements</a></li>
     </ul>
     <ul class="icons">
+        {% if user is defined %}
         <li>
-            <i class="pointer fas fa-user-plus"></i>
+            <span>{{ user.username }}</span>
         </li>
         <li>
-            <a href="/login">
+            <a href="/signout">
+                <i class="pointer fas fa-sign-out-alt"></i>
+            </a>
+        </li>
+        {% else %}
+        <li>
+            <a href="/signup">
+                <span>Înregistrare</span>
+                <i class="pointer fas fa-user-plus"></i>
+            </a>
+        </li>
+        <li>
+            <a href="/signin">
+                <span>Autentificare</span>
                 <i class="pointer fas fa-sign-in-alt"></i>
             </a>
         </li>
+        {% endif %}
     </ul>
 </nav>
