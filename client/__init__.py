@@ -31,7 +31,13 @@ def index():
         article['id'] = id
         id += 1
 
-    return render_template('index.html', news=news, user=user)
+    return render_template('index.html', news=news, user=user, news_count = len(news))
+     
+    
+
+@blueprint.route('/generic', methods=['GET'])
+def generic():
+    return render_template('generic.html')
 
 
 @blueprint.route('/signin', methods=['GET', 'POST'])
