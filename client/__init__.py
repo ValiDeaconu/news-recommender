@@ -31,7 +31,7 @@ def signup():
         if rf.validate_on_submit():
             # if password != confirm_password:
 
-            User(username = username, password = sha256_crypt.hash(password), mutation_rate = 0.0) # .save()
+            User(username = username, password = sha256_crypt.hash(password), mutation_rate = 0.0).save()
             return render_template('signup.html', form=rf, success=True, message='Contul a fost creat cu succes.')
             
         return render_template('signup.html', form=rf, success=False, message='Error.')
