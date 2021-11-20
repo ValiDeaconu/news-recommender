@@ -35,3 +35,31 @@
     background: #04AA6D;
     cursor: pointer;
 }
+.pointer{
+	cursor: pointer;
+}
+
+.content-center{
+    display: flex;
+	justify-content: center;
+}
+
+.content-end{
+    display: flex;
+	justify-content: end;
+}
+
+.grid-center{
+    display: grid;
+    justify-content: center;
+}
+.pl-3{
+    padding-left: 3%;
+}
+.pt-5{
+    padding-top: 5%;
+}
+
+
+
+

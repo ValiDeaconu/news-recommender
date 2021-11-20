@@ -10,17 +10,48 @@
         <!-- Post -->
         <section class="post">
             <header class="major">
-                <h1>Selecteaza categoriile<br />
-                    care te intereseaza</h1>
-                    <span class="date"></span>
+                <h1>Selectează categoriile<br />
+                    care te interesează</h1>
+                <span class="date"></span>
             </header>
-            <div>
+            <div class="pl-3">
+                <div class="col-4 col-12-small">
+                    <input type="checkbox" id="check-general" name="check-general">
+                    <label for="check-general">General</label>
+                </div>
+                <div class="col-4 col-12-small">
+                    <input type="checkbox" id="check-afaceri" name="check-afaceri">
+                    <label for="check-afaceri">Afaceri</label>
+                </div>
+                <div class="col-4 col-12-small">
+                    <input type="checkbox" id="check-divertisment" name="check-divertisment">
+                    <label for="check-divertisment">Divertisment</label>
+                </div>
+                <div class="col-4 col-12-small">
+                    <input type="checkbox" id="check-sanatate" name="check-sanatate">
+                    <label for="check-sanatate">Sănătate</label>
+                </div>
+                <div class="col-4 col-12-small">
+                    <input type="checkbox" id="check-stiinta" name="check-stiinta">
+                    <label for="check-stiinta">Știință</label>
+                </div>
+                <div class="col-4 col-12-small">
+                    <input type="checkbox" id="check-sport" name="check-sport">
+                    <label for="check-sport">Sport</label>
+                </div>
+                <div class="col-4 col-12-small">
+                    <input type="checkbox" id="check-tehnologie" name="check-tehnologie">
+                    <label for="check-tehnologie">Tehnologie</label>
+                </div>
             </div>
-        </section>
-
+            <ul class="actions content-center pt-5">
+                <li><a href="#" class="button primary">Submit</a></li>
+            </ul>
     </div>
+    </section>
+</div>
 
-    {% include 'outro.html' %}
+{% include 'outro.html' %}
 
 </div>
 {% include 'footer.html' %}
