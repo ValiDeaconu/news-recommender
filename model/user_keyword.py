@@ -1,6 +1,7 @@
-from enum import unique
 from sqlalchemy.orm import relationship
 from model import db
+
+from random import sample
 
 class UserKeyword(db.Model):
     __tablename__ = 'user_keyword'
@@ -28,4 +29,12 @@ class UserKeyword(db.Model):
     @staticmethod
     def find_all_disliked_by_user_id(user_id: int):
         return UserKeyword.query.filter(UserKeyword.user_id == user_id).filter(UserKeyword.liked == False).all()
+
+    @staticmethod
+    def find_random_sample_for_user(user_id: int, sample_max_size: int = 10):
+        keywords = UserKeyword.find_all_liked_by_user_id(user_id)
+        size = min(sample_max_size, len(keywords))
+        keywords = sample(keywords, size)
+
+        return [k.keyword for k in keywords]
     
