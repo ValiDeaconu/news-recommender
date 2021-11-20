@@ -13,3 +13,7 @@ def generic():
 @blueprint.route('/elements', methods=['GET'])
 def elements():
     return render_template('elements.html')
+
+@blueprint.route('/login', methods=['GET'])
+def login():
+    return render_template('login.html')
