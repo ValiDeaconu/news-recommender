@@ -37,3 +37,7 @@ def signup():
         return render_template('signup.html', form=rf, success=False, message='Error.')
 
     return render_template('signup.html', form=rf)
+    
+@blueprint.route('/login', methods=['GET'])
+def login():
+    return render_template('login.html')
