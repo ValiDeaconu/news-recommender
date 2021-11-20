@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, session, redirect, url_fo
 
 from form.register import Form as RegisterForm
 from form.login import Form as LoginForm
+from form.profile import Form as ProfileForm
 from model import User
 
 from hashlib import sha256
@@ -72,6 +73,34 @@ def signout():
     session['logged_in'] = False
     session.pop('user')
     return redirect(url_for('client.index'))
+
+@blueprint.route('/profile', methods=['GET', 'POST'])
+def profile():
+    if session.get('logged_in') == False:
+        return redirect(url_for('client.index'))
+
+    user = User.find_by_id(session.get('user').id)
+
+    pf = ProfileForm()
+
+    if request.method == 'GET':
+        pf.mutation_rate.data = int(user.mutation_rate * 100.0)
+
+    if request.method == 'POST':
+        print (pf.mutation_rate.data)
+        mutation_rate = pf.mutation_rate.data
+
+        if pf.validate_on_submit():
+            user.mutation_rate = mutation_rate / 100.0
+            user.save()
+
+            return render_template('profile.html', 
+                                    form=pf, 
+                                    user=session.get('user'),
+                                    success=True, 
+                                    message=f'Rata de mutație a fost actualizată la {mutation_rate}.')
+
+    return render_template('profile.html', form=pf, user=session.get('user'))
 
 @blueprint.route('/categories', methods=['GET'])
 def categories():

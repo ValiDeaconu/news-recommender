@@ -1,0 +1,59 @@
+{% include 'header.html' %}
+<!-- Wrapper -->
+<div id="wrapper">
+
+    {% include 'navbar.html' %}
+
+    <!-- Main -->
+    <div id="main">
+        <section>
+            <header class="major">
+                <h1>Profilul tău, {{ user.username }}</h1>
+            </header>
+            
+            <p>Rata de mutație actuală: <span id="mutation_rate_output">{{ user.mutation_rate }}</span></p>
+
+			{% if success is defined %}
+				{% if success %}
+					<p class='success-message'>{{ message }}</p>
+				{% endif %}
+			{% endif %}
+
+            {% for field, errors in form.errors.items() %}
+                {% for err in errors %}
+                    <p class='failure-message'>
+                        {{ err }}
+                    </p>
+                {% endfor %}
+            {% endfor %}
+
+            <form method="POST">
+                {{ form.csrf_token }}
+                
+                <div class="fields">
+                    <div class="field">
+                        <label for="mutation_rate">Rată de mutație (cât la % din știri doriți să fie complet aleatorii)?
+                        </label>
+                        {{ form.mutation_rate(class='slider') }}
+                    </div>
+                </div>
+                <ul class="actions content-center">
+                    <li><input type="submit" value="Salvează" /></li>
+                </ul>
+            </form>
+        </section>
+    </div>
+    {% include 'outro.html' %}
+
+    <script>
+        var slider = document.getElementById("mutation_rate");
+        var output = document.getElementById("mutation_rate_output");
+        output.innerHTML = slider.value;
+
+        slider.oninput = function() {
+            output.innerHTML = this.value;
+        }
+    </script>
+
+</div>
+{% include 'footer.html' %}

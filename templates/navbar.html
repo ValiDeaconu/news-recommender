@@ -13,7 +13,9 @@
     <ul class="icons">
         {% if user is defined %}
         <li>
-            <span>{{ user.username }}</span>
+            <a href="/profile">
+                <span>{{ user.username }}</span>
+            </a>
         </li>
         <li>
             <a href="/signout">

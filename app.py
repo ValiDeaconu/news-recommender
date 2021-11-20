@@ -48,5 +48,7 @@ def serve_image(path: str):
 
 # Entrypoint
 if __name__ == '__main__':
+    os.environ['FLASK_ENV'] = 'development'
+    
     app.init()
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
