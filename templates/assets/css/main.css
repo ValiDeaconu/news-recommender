@@ -71,15 +71,6 @@ input, select, textarea {
 	-ms-appearance: none;
 	appearance: none;
 }
-.pointer{
-	cursor: pointer;
-}
-.content-center{
-	justify-content: center;
-}
-.content-end{
-	justify-content: end;
-}
 /* Basic */
 
 	@-ms-viewport {
