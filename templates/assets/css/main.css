@@ -71,7 +71,9 @@ input, select, textarea {
 	-ms-appearance: none;
 	appearance: none;
 }
-
+.pointer{
+	cursor: pointer;
+}
 /* Basic */
 
 	@-ms-viewport {
