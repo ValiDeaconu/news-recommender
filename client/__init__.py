@@ -11,6 +11,7 @@ from hashlib import sha256
 
 import requests
 import datetime
+import random
 
 blueprint = Blueprint('client', __name__)
 
@@ -19,9 +20,13 @@ def index():
     if not session.get('logged_in') or session.get('logged_in') == False:
         return redirect(url_for('client.signin'))
     
-    keywords = UserKeyword.find_all_liked_by_user_id(user_id=session.get("user_id"))
+    keywords = UserKeyword.find_all_liked_by_user_id(session.get("user_id"))
+    size = min(10, len(keywords))
+    keywords = random.sample(keywords, size)
+    keywords = [k.keyword for k in keywords]
 
     url = 'https://newsapi.org/v2/everything?sortBy=popularity&apiKey=a29ea4304a564e7bbf8275c596a64dd1&q='
+    print(keywords)
 
     if len(keywords) >= 1:
         query = ' OR '.join([k for k in keywords])
