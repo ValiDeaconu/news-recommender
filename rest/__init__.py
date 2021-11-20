@@ -6,7 +6,6 @@ from model import User, UserCategory, UserKeyword
 
 from form.register import Form as RegisterForm
 from form.login import Form as LoginForm
-from form.set_categories import Form as SetCategoriesForm
 
 import requests
 
@@ -14,12 +13,10 @@ import requests
 import spacy 
 
 ubp = Blueprint('user', __name__)
-cbp = Blueprint('category', __name__)
 kbp = Blueprint('keyword', __name__)
 
 Blueprints = [
     ('/user', ubp),
-    ('/user_category', cbp),
     ('/user_keyword', kbp)
 ]
 
@@ -42,20 +39,13 @@ def login():
     if not user :
         return -1
 
-    session['user'] = user
-    return 0
-
-# Set user categories
-@cbp.route('/', methods=["POST"])
-def set_user_categories():
-    form = SetCategoriesForm()
-
+    session['user_id'] = user.id
     return 0
 
 # Set user mutation rate
 @ubp.route('/mutation/<mutation_rate>', methods=["POST"])
 def set_user_mutation_rate(mutation_rate):
-    current_user = session.get('user')
+    current_user = User.find_by_id(id=session.get('user_id'))
 
     current_user.mutation_rate = mutation_rate
     current_user.save()
@@ -93,7 +83,7 @@ def get_headlines():
 # Set liked user keywords
 @kbp.route('/liked', methods=["POST"])
 def set_liked_user_keywords():
-    user_id = session.get('user').id
+    user_id = session.get('user_id')
     keywords = request.json['keywords']
 
     for keyword in keywords:
@@ -104,7 +94,7 @@ def set_liked_user_keywords():
 # Set disliked user keywords
 @kbp.route('/disliked', methods=["POST"])
 def set_disliked_user_keywords():
-    user_id = session.get('user').id
+    user_id = session.get('user_id')
     keywords = request.json['keywords']
 
     for keyword in keywords:
@@ -115,7 +105,7 @@ def set_disliked_user_keywords():
 
 @kbp.route('/like-news', methods=["POST"])
 def like_news():
-    user_id = session.get('user').id
+    user_id = session.get('user_id')
     news = request.json['news']
 
     nlp = spacy.load("en_core_web_sm")
