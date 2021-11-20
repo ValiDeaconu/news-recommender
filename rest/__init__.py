@@ -8,13 +8,19 @@ from form.register import Form as RegisterForm
 from form.login import Form as LoginForm
 from form.set_categories import Form as SetCategoriesForm
 
+import requests
+
+#python -m spacy download en_core_web_sm
+import spacy 
+
 ubp = Blueprint('user', __name__)
 cbp = Blueprint('category', __name__)
 kbp = Blueprint('keyword', __name__)
 
 Blueprints = [
     ('/user', ubp),
-    ('/user_category', cbp)
+    ('/user_category', cbp),
+    ('/user_keyword', kbp)
 ]
 
 # Register
@@ -57,8 +63,32 @@ def set_user_mutation_rate(mutation_rate):
     return 0
 
 # Get news api
+@ubp.route('/get-news', methods=["GET"])
+def get_news():
+    url = ('https://newsapi.org/v2/everything?q=')
+    for keyword in UserKeyword.find_all_by_user_id(session.get("user").id) :
+        url = url + ' OR ' + keyword
+
+    url = url + ('&sortBy=popularity&'
+       'apiKey=a29ea4304a564e7bbf8275c596a64dd1')
+
+    response = requests.get(url)
+
+    return response.json(), 200
+
 
 # Get headlines by category
+@ubp.route('/get-headlines', methods=["GET"])
+def get_headlines():
+    url = ('https://newsapi.org/v2/top-headlines?country=ro&category=')
+    for category in UserCategory.find_all_by_user_id(session.get("user").id) :
+        url = url + ' OR ' + category
+
+    url = url + ('&apiKey=a29ea4304a564e7bbf8275c596a64dd1')
+
+    response = requests.get(url)
+
+    return response.json(), 200
 
 # Set liked user keywords
 @kbp.route('/liked', methods=["POST"])
@@ -74,13 +104,33 @@ def set_liked_user_keywords():
 # Set disliked user keywords
 @kbp.route('/disliked', methods=["POST"])
 def set_disliked_user_keywords():
-    user_id = get_current_user().id
+    user_id = session.get('user').id
     keywords = request.json['keywords']
 
     for keyword in keywords:
         UserKeyword(user_id = user_id, keyword = keyword, liked = False).save()
 
     return 0
+
+
+@kbp.route('/like-news', methods=["POST"])
+def like_news():
+    user_id = session.get('user').id
+    news = request.json['news']
+
+    nlp = spacy.load("en_core_web_sm")
+
+    doc = nlp(news)
+
+    print("Noun phrases:", [chunk.text for chunk in doc.noun_chunks])
+    print("Verbs:", [token.lemma_ for token in doc if token.pos_ == "VERB"])
+
+    # Find named entities, phrases and concepts
+    for entity in doc.ents:
+        print(entity.text, entity.label_)
+
+    return 0
+
 
 
 

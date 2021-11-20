@@ -3,18 +3,41 @@ from flask import Blueprint, render_template, request, session, redirect, url_fo
 from form.register import Form as RegisterForm
 from form.login import Form as LoginForm
 from form.profile import Form as ProfileForm
-from model import User
+from model import User, UserKeyword
 
 from hashlib import sha256
+import requests
+import json
+import datetime
 
 blueprint = Blueprint('client', __name__)
 
 @blueprint.route('/', methods=['GET'])
 def index():
-    if session.get('logged_in') == True:
-        return render_template('index.html', user=session.get('user'))
+    if not session.get('logged_in') or session.get('logged_in') == False:
+        return redirect(url_for('client.signin'))
     
-    return render_template('index.html')
+    keywords = UserKeyword.find_all_liked_by_user_id(session.get("user").id)
+
+    url = 'https://newsapi.org/v2/everything?sortBy=popularity&apiKey=a29ea4304a564e7bbf8275c596a64dd1&q='
+
+    if len(keywords) >= 1:
+        query = ' OR '.join([k for k in keywords])
+    else:
+        query = 'a'
+
+    url = f'{url}{query}'
+
+    print(url)
+
+    response = requests.get(url)
+
+    articles = response.json()['articles']
+
+    for a in articles:
+        a['publishedAt'] = datetime.datetime.strptime(a['publishedAt'], '%Y-%m-%dT%H:%M:%SZ').strftime('%d %B %Y %H:%M')
+
+    return render_template('index.html', news=articles)
 
 @blueprint.route('/generic', methods=['GET'])
 def generic():
@@ -67,7 +90,7 @@ def signin():
 
 @blueprint.route('/signout', methods=['GET'])
 def signout():
-    if session.get('logged_in') == False:
+    if not session.get('logged_in') or session.get('logged_in') == False:
         return redirect(url_for('client.index'))
 
     session['logged_in'] = False
@@ -76,7 +99,7 @@ def signout():
 
 @blueprint.route('/profile', methods=['GET', 'POST'])
 def profile():
-    if session.get('logged_in') == False:
+    if not session.get('logged_in') or session.get('logged_in') == False:
         return redirect(url_for('client.index'))
 
     user = User.find_by_id(session.get('user').id)
