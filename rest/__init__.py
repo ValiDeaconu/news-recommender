@@ -1,20 +1,20 @@
-from flask import Blueprint, send_file, jsonify, request
+from flask import Blueprint, send_file, jsonify, request, session, make_response
 from os.path import join
 from passlib.hash import sha256_crypt
 
-from model import User
+from model import User, UserCategory, UserKeyword
 
 from form.register import Form as RegisterForm
 from form.login import Form as LoginForm
+from form.set_categories import Form as SetCategoriesForm
 
 ubp = Blueprint('user', __name__)
 cbp = Blueprint('category', __name__)
-# lbp = Blueprint('locality', __name__)
-# dbp = Blueprint('download', __name__)
-# rbp = Blueprint('reservation', __name__)
+kbp = Blueprint('keyword', __name__)
 
 Blueprints = [
     ('/user', ubp),
+    ('/user_category', cbp)
 ]
 
 # Register
@@ -36,16 +36,53 @@ def login():
     if not user :
         return -1
 
+    session['user'] = user
     return 0
 
 # Set user categories
 @cbp.route('/', methods=["POST"])
 def set_user_categories():
+    form = SetCategoriesForm()
+
     return 0
 
-@ubp.route('/', methods=["POST"])
-def set_user_mutation_rate():
-    
+# Set user mutation rate
+@ubp.route('/mutation/<mutation_rate>', methods=["POST"])
+def set_user_mutation_rate(mutation_rate):
+    current_user = session.get('user')
+
+    current_user.mutation_rate = mutation_rate
+    current_user.save()
+
+    return 0
+
+# Get news api
+
+# Get headlines by category
+
+# Set liked user keywords
+@kbp.route('/liked', methods=["POST"])
+def set_liked_user_keywords():
+    user_id = session.get('user').id
+    keywords = request.json['keywords']
+
+    for keyword in keywords:
+        UserKeyword(user_id = user_id, keyword = keyword, liked = True).save()
+
+    return 0
+
+# Set disliked user keywords
+@kbp.route('/disliked', methods=["POST"])
+def set_disliked_user_keywords():
+    user_id = get_current_user().id
+    keywords = request.json['keywords']
+
+    for keyword in keywords:
+        UserKeyword(user_id = user_id, keyword = keyword, liked = False).save()
+
+    return 0
+
+
 
 # @lbp.route('/<county_id>', methods=['GET'])
 # def find_localities_in_county(county_id):
