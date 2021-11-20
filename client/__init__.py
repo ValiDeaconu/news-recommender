@@ -81,7 +81,7 @@ def signup():
 
         if rf.validate_on_submit():
             user = User(username=username, password=password,
-                        mutation_rate=50.0)
+                        mutation_rate=0.5)
             user.save()
             session['logged_in'] = True
             session['user_id'] = user.id
@@ -152,7 +152,6 @@ def profile():
         pf.mutation_rate.data = int(user.mutation_rate * 100.0)
 
     if request.method == 'POST':
-        print(pf.mutation_rate.data)
         mutation_rate = pf.mutation_rate.data
 
         if pf.validate_on_submit():
