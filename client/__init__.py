@@ -5,48 +5,36 @@ from form.login import Form as LoginForm
 from form.profile import Form as ProfileForm
 from form.categories import Form as CategoryForm
 
-from model import User, UserCategory, UserKeyword
+from model import User, UserCategory
+
+from news import get_news_for_user
 
 from hashlib import sha256
-
-import requests
-import datetime
-import random
+from datetime import datetime
 
 blueprint = Blueprint('client', __name__)
+
 
 @blueprint.route('/', methods=['GET'])
 def index():
     if not session.get('logged_in') or session.get('logged_in') == False:
         return redirect(url_for('client.signin'))
-    
-    keywords = UserKeyword.find_all_liked_by_user_id(session.get("user_id"))
-    size = min(10, len(keywords))
-    keywords = random.sample(keywords, size)
-    keywords = [k.keyword for k in keywords]
 
-    url = 'https://newsapi.org/v2/everything?sortBy=popularity&apiKey=a29ea4304a564e7bbf8275c596a64dd1&q='
-    print(keywords)
+    user = User.find_by_id(id=session.get("user_id"))
+    news = get_news_for_user(user_id=user.id)
 
-    if len(keywords) >= 1:
-        query = ' OR '.join([k for k in keywords])
-    else:
-        query = 'a'
+    # Add id to articles and change date to human readable format
+    id = 0
+    for article in news:
+        article['publishedAt'] = datetime.strptime(
+            article['publishedAt'], '%Y-%m-%dT%H:%M:%SZ').strftime('%d %B %Y %H:%M')
+        article['id'] = id
+        id += 1
 
-    url = f'{url}{query}'
-
-    response = requests.get(url)
-
-    articles = response.json()['articles']
-
-    for a in articles:
-        a['publishedAt'] = datetime.datetime.strptime(a['publishedAt'], '%Y-%m-%dT%H:%M:%SZ').strftime('%d %B %Y %H:%M')
-
-    return render_template('index.html', news=articles, user=User.find_by_id(id=session.get("user_id")))
+    return render_template('index.html', news=news, user=user)
 
 
-
-@Blueprint.route('/signin', methods=['GET', 'POST'])
+@blueprint.route('/signin', methods=['GET', 'POST'])
 def signin():
     if session.get('logged_in') == True:
         return redirect(url_for('client.index'))
@@ -73,7 +61,7 @@ def signin():
     return render_template('signin.html', form=lf)
 
 
-@Blueprint.route('/signout', methods=['GET'])
+@blueprint.route('/signout', methods=['GET'])
 def signout():
     if not session.get('logged_in') or session.get('logged_in') == False:
         return redirect(url_for('client.signin'))
@@ -83,7 +71,7 @@ def signout():
     return redirect(url_for('client.signin'))
 
 
-@Blueprint.route('/signup', methods=['GET', 'POST'])
+@blueprint.route('/signup', methods=['GET', 'POST'])
 def signup():
     rf = RegisterForm()
 
@@ -105,7 +93,7 @@ def signup():
     return render_template('signup.html', form=rf)
 
 
-@Blueprint.route('/setup', methods=['GET', 'POST'])
+@blueprint.route('/setup', methods=['GET', 'POST'])
 def setup():
     if not session.get('logged_in') or session.get('logged_in') == False:
         return redirect(url_for('client.signin'))
@@ -151,7 +139,7 @@ def setup():
     return render_template('categories.html', form=cf)
 
 
-@Blueprint.route('/profile', methods=['GET', 'POST'])
+@blueprint.route('/profile', methods=['GET', 'POST'])
 def profile():
     if not session.get('logged_in') or session.get('logged_in') == False:
         return redirect(url_for('client.signin'))
