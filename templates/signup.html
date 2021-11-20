@@ -1,0 +1,59 @@
+{% include 'header.html' %}
+<!-- Wrapper -->
+<div id="wrapper">
+
+	{% include 'navbar.html' %}
+
+	<!-- Main -->
+	<div id="main">
+
+		<!-- Post -->
+		<section class="post">
+			<header class="major">
+				<h1>Crează un cont nou</h1>
+				<p>Fii la curent cu tot ce se întamplă în Romania. Creează un cont gratuit.</p>
+			</header>
+
+			{% if success is defined %}
+				{% if success %}
+					<p class='success-message'>{{ message }}</p>
+				{% endif %}
+			{% endif %}
+
+			{% for field, errors in form.errors.items() %}
+				{% for err in errors %}
+					<p class='failure-message'>
+						{{ err }}
+					</p>
+				{% endfor %}
+			{% endfor %}
+
+			<form method="POST">
+				{{ form.csrf_token }}
+				
+				<div class="fields">
+					<div class="field">
+						<label for="username">Nume de utilizator</label>
+						{{ form.username }}
+					</div>
+					<div class="field">
+						<label for="password">Parolă</label>
+						{{ form.password }}
+					</div>
+					<div class="field">
+						<label for="confirm_password">Repetă parola</label>
+						{{ form.confirm_password }}
+					</div>
+				</div>
+				<ul class="actions">
+					<li><input type="submit" value="Trimite" /></li>
+				</ul>
+			</form>
+		</section>
+
+	</div>
+
+	{% include 'outro.html' %}
+
+</div>
+{% include 'footer.html' %}
