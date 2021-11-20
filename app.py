@@ -2,15 +2,10 @@ import os
 from flask import Flask, send_from_directory
 from model import db
 
-import rest
 import client
 
 class FlaskWrapper(Flask):
     def init(self):
-        # Register REST endpoints
-        for bp in rest.Blueprints:
-            self.register_blueprint(bp[1], url_prefix=bp[0])
-
         # Register template endpoints
         self.register_blueprint(client.blueprint)
 
@@ -27,12 +22,6 @@ class FlaskWrapper(Flask):
             with self.app_context():
                 db.init_app(self)
                 db.create_all()
-
-                # Rebuild Database
-                if (False):
-                    db.drop_all()
-                    create_data.load_cities(self, db)
-                    create_data.create_movies(self, db)
 
         super(FlaskWrapper, self).run(host=host, port=port, debug=debug, load_dotenv=load_dotenv, **options)
 
