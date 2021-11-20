@@ -10,6 +10,7 @@ class User(db.Model):
     mutation_rate = db.Column(db.Float, nullable=False, unique=False, server_default='0.0')
 
     categories = relationship('UserCategory')
+    keywords = relationship('UserKeyword')
 
     def __init__(self, username: str, password: str, mutation_rate: float):
         self.username = username
