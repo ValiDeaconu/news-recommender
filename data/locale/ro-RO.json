@@ -1,0 +1,12 @@
+{
+    "COMPANY_NAME": "eCinemaGov",
+    
+    "CHILD_DISCOUNT": "reducere de copil",
+    "STUDENT_DISCOUNT": "reducere de student",
+    "OLDER_DISCOUNT": "reducere pentru persoanele in varsta",
+
+    "RANDOM_ROW_DISCOUNT": "reducere pentru rand aleator",
+    "RANDOM_COLUMN_DISCOUNT": "reducere pentru scaun aleator",
+
+    "RANDOM": "Aleator"
+}
