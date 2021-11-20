@@ -25,24 +25,45 @@
 					<span class="date">{{ art.publishedAt }}</span>
 					<h4><a href="{{ art.url }}">{{ art.title }}</a></h4>
 				</header>
-				<a href="{{ art.url }}" class="image fit"><img src="{{ art.urlToImage}}" alt="" /></a>
-				<p>{{ art.description }}</p>
+				<a href="{{ art.url }}" class="image fit"><img src="{{ art.urlToImage }}" alt="" /></a>
+				<p id="article_description_{{ art.id }}">{{ art.description }}</p>
 				<ul class="actions special">
-					<li><a href="#" class="button icon solid fa-heart"></a></li>
-					<li><a href="{{ art.url }}" class="button">View full article</a></li>	
-					<li><a href="#" class="button icon solid fa-heart-broken"></a></li>
-
+					<li><a href="#" class="button icon solid fa-heart" id="article_like_{{ art.id }}"></a></li>
+					<li><a href="{{ art.url }}" class="button">View full article</a></li>
+					<li><a href="#" class="button icon solid fa-heart-broken" id="article_dislike_{{ art.id }}"></a></li>
 				</ul>
 			</article>
 			{% endfor %}
 		</section>
 
-
-
 	</div>
-
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script>
+		for (let i = 0; i < {{ news_count }}; i++) {
+			let like = document.getElementById(`article_like_${i}`);
+			let dislike = document.getElementById(`article_dislike_${i}`);
+			let description = document.getElementById(`article_description_${i}`)
+			like.onclick = (e) => {
+				e.preventDefault();
+				axios.post('/user_keyword/like-news', { news: description.textContent })
+					.then(function (response) {
+						console.log(response);
+					})
+				console.log(`Liked ${i}`)
+				console.log(description)
+			}
+			dislike.onclick = (e) => {
+				e.preventDefault();
+				axios.post('//user_keyword/dislike-news', { news: description.textContent })
+					.then(function (response) {
+						console.log(response);
+					})
+				console.log(`Disliked ${i}`)
+				console.log(description)
+			}
+		}
+	</script>
 	{% include 'outro.html' %}
-
 </div>
 
 {% include 'footer.html' %}
