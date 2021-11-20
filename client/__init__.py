@@ -41,3 +41,7 @@ def signup():
 @blueprint.route('/login', methods=['GET'])
 def login():
     return render_template('login.html')
+
+@blueprint.route('/categories', methods=['GET'])
+def categories():
+    return render_template('categories.html')
