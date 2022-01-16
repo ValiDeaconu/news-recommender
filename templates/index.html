@@ -28,9 +28,9 @@
 				<a href="{{ art.url }}" class="image fit"><img src="{{ art.urlToImage }}" alt="" /></a>
 				<p id="article_description_{{ art.id }}">{{ art.description }}</p>
 				<ul class="actions special">
-					<li><a href="#" class="button icon solid fa-heart" id="article_like_{{ art.id }}"></a></li>
+					<li><button class="button icon solid fa-heart" id="article_like_{{ art.id }}"></button></li>
 					<li><a href="{{ art.url }}" class="button">View full article</a></li>
-					<li><a href="#" class="button icon solid fa-heart-broken" id="article_dislike_{{ art.id }}"></a></li>
+					<li><button class="button icon solid fa-heart-broken" id="article_dislike_{{ art.id }}"></button></li>
 				</ul>
 			</article>
 			{% endfor %}
@@ -51,15 +51,17 @@
 					})
 				console.log(`Liked ${i}`)
 				console.log(description)
+				like.disabled = 'true';
 			}
 			dislike.onclick = (e) => {
 				e.preventDefault();
-				axios.post('//user_keyword/dislike-news', { news: description.textContent })
+				axios.post('/user_keyword/dislike-news', { news: description.textContent })
 					.then(function (response) {
 						console.log(response);
 					})
 				console.log(`Disliked ${i}`)
 				console.log(description)
+				dislike.disabled = 'true';
 			}
 		}
 	</script>

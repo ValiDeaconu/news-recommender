@@ -32,9 +32,11 @@ class UserKeyword(db.Model):
 
     @staticmethod
     def find_random_sample_for_user(user_id: int, sample_max_size: int = 10):
-        keywords = UserKeyword.find_all_liked_by_user_id(user_id)
-        size = min(sample_max_size, len(keywords))
-        keywords = sample(keywords, size)
+        liked_keywords = UserKeyword.find_all_liked_by_user_id(user_id)
+        disliked_keywords = UserKeyword.find_all_disliked_by_user_id(user_id)
 
-        return [k.keyword for k in keywords]
+        size = min(sample_max_size, len(liked_keywords) + len(disliked_keywords))
+        keywords = sample(liked_keywords + disliked_keywords, size)
+
+        return [(k.keyword, True if k.liked else False) for k in keywords]
     

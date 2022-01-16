@@ -40,7 +40,7 @@ def get_headlines():
 # Add keywords based on disliked news
 @kbp.route('/dislike-news', methods=["POST"])
 def dislike_news():
-    user_id = session.get('user').id
+    user_id = session.get('user_id')
     news = request.json['news']
 
     nlp = spacy.load("en_core_web_sm")
