@@ -22,6 +22,14 @@ class UserKeyword(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @staticmethod
+    def find_all_by_user_id(user_id: int):
+        return UserKeyword.query.filter(UserKeyword.user_id == user_id).all()
+
     @staticmethod
     def find_all_liked_by_user_id(user_id: int):
         return UserKeyword.query.filter(UserKeyword.user_id == user_id).filter(UserKeyword.liked == True).all()

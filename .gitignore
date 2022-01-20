@@ -8,5 +8,5 @@
 **/__pycache__/**
 
 # Flask Session
-
+**/flask_session
 **/flask_session/**

@@ -1,19 +1,16 @@
-from flask import Blueprint, send_file, jsonify, request, session, make_response
-from os.path import join
-from passlib.hash import sha256_crypt
+from flask import Blueprint, jsonify, request, session
 
-from model import User, UserCategory, UserKeyword
-
-from form.register import Form as RegisterForm
-from form.login import Form as LoginForm
-
-import requests
+from model import UserKeyword
 
 from hashlib import sha256
 from string import punctuation
 
 #python -m spacy download en_core_web_sm
 import spacy 
+
+nlp = spacy.load("en_core_web_sm")
+
+POS_TAGS = ['PROPN', 'NOUN']
 
 ubp = Blueprint('user', __name__)
 kbp = Blueprint('keyword', __name__)
@@ -23,19 +20,44 @@ Blueprints = [
     ('/user_keyword', kbp)
 ]
 
+def extract_keywords(text: str) -> list[str]:
+    doc = nlp(text)
 
-# Get headlines by category
-@ubp.route('/get-headlines', methods=["GET"])
-def get_headlines():
-    url = ('https://newsapi.org/v2/top-headlines?country=ro&category=')
-    for category in UserCategory.find_all_by_user_id(session.get("user").id) :
-        url = url + ' OR ' + category
+    # Look for composed nouns (e.g. names: "Borris Johnson")
+    composed_nouns = []
+    for chunk in doc.noun_chunks:
+        tokens = [t.text.strip() for t in chunk if t.pos_ in POS_TAGS]
+        
+        if len(tokens) > 0:
+            composed_nouns.append(" ".join(tokens))
 
-    url = url + ('&apiKey=a29ea4304a564e7bbf8275c596a64dd1')
+    # Look for singular nouns
+    singular_nouns = [
+        t.text.strip() for t in doc 
+        if t.text not in nlp.Defaults.stop_words 
+            and t.text not in punctuation 
+            and t.pos_ in POS_TAGS
+            and t.text not in composed_nouns
+    ]
 
-    response = requests.get(url)
+    return composed_nouns + singular_nouns
 
-    return response.json(), 200
+
+def process_like_action(user_id: str, news: str, is_liked: bool):
+    keywords = extract_keywords(news)
+
+    user_keywords = UserKeyword.find_all_by_user_id(user_id = user_id)
+    user_keywords_dict = {}
+    for k in user_keywords:
+        user_keywords_dict[k.keyword] = k
+
+    for k in keywords:
+        if k in user_keywords_dict:
+            if is_liked != user_keywords_dict[k].liked:
+                user_keywords_dict[k].delete()
+        else:
+            UserKeyword(user_id = user_id, keyword = k, liked = is_liked).save()
+
 
 # Add keywords based on disliked news
 @kbp.route('/dislike-news', methods=["POST"])
@@ -43,35 +65,9 @@ def dislike_news():
     user_id = session.get('user_id')
     news = request.json['news']
 
-    nlp = spacy.load("en_core_web_sm")
-
-    doc = nlp(news)
-
-    print("Noun phrases:", [chunk.text for chunk in doc.noun_chunks])
-    print("Verbs:", [token.lemma_ for token in doc if token.pos_ == "VERB"])
-
-    pos_tag = ['PROPN', 'NOUN']
-
-    keywords = []
-    for chunk in doc.noun_chunks:
-        final_chunk = ""
-        for token in chunk:
-            if (token.pos_ in pos_tag):
-                final_chunk =  final_chunk + token.text + " "
-        if final_chunk:
-            keywords.append(final_chunk.strip())
-
-
-    for token in doc:
-        if (token.text in nlp.Defaults.stop_words or token.text in punctuation):
-            continue
-        if (token.pos_ in pos_tag):
-            keywords.append(token.text)
-
-    for keyword in keywords:
-        UserKeyword(user_id = user_id, keyword = keyword, liked = False).save()
-
-    return jsonify([{'keywords': list(set(keywords))}])
+    process_like_action(user_id, news, is_liked=False)
+  
+    return ""
 
 
 # Add keywords based on liked news
@@ -80,32 +76,6 @@ def like_news():
     user_id = session.get('user_id')
     news = request.json['news']
 
-    nlp = spacy.load("en_core_web_sm")
+    process_like_action(user_id, news, is_liked=True)
 
-    doc = nlp(news)
-
-    print("Noun phrases:", [chunk.text for chunk in doc.noun_chunks])
-    print("Verbs:", [token.lemma_ for token in doc if token.pos_ == "VERB"])
-
-    pos_tag = ['PROPN', 'NOUN']
-
-    keywords = []
-    for chunk in doc.noun_chunks:
-        final_chunk = ""
-        for token in chunk:
-            if (token.pos_ in pos_tag):
-                final_chunk =  final_chunk + token.text + " "
-        if final_chunk:
-            keywords.append(final_chunk.strip())
-
-
-    for token in doc:
-        if (token.text in nlp.Defaults.stop_words or token.text in punctuation):
-            continue
-        if (token.pos_ in pos_tag):
-            keywords.append(token.text)
-
-    for keyword in keywords:
-        UserKeyword(user_id = user_id, keyword = keyword, liked = True).save()
-
-    return jsonify([{'keywords': list(set(keywords))}])
+    return ""

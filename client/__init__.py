@@ -73,7 +73,7 @@ def signout():
         return redirect(url_for('client.signin'))
 
     session['logged_in'] = False
-    session.pop('user')
+    session.pop('user_id')
     return redirect(url_for('client.signin'))
 
 
@@ -132,7 +132,6 @@ def setup():
         if cf.technology.data:
             categories.append('technology')
 
-        print(categories)
         user_id = session.get('user_id')
 
         for category in categories:

@@ -23,7 +23,7 @@
 			<article>
 				<header>
 					<span class="date">{{ art.publishedAt }}</span>
-					<h4><a href="{{ art.url }}">{{ art.title }}</a></h4>
+					<h4><a id="article_title_{{ art.id }}" href="{{ art.url }}">{{ art.title }}</a></h4>
 				</header>
 				<a href="{{ art.url }}" class="image fit"><img src="{{ art.urlToImage }}" alt="" /></a>
 				<p id="article_description_{{ art.id }}">{{ art.description }}</p>
@@ -42,25 +42,24 @@
 		for (let i = 0; i < {{ news_count }}; i++) {
 			let like = document.getElementById(`article_like_${i}`);
 			let dislike = document.getElementById(`article_dislike_${i}`);
+
+			let title = document.getElementById(`article_title_${i}`)
 			let description = document.getElementById(`article_description_${i}`)
+
+			let news = title.textContent + " " + description.textContent
+
 			like.onclick = (e) => {
 				e.preventDefault();
-				axios.post('/user_keyword/like-news', { news: description.textContent })
-					.then(function (response) {
-						console.log(response);
-					})
-				console.log(`Liked ${i}`)
-				console.log(description)
+				axios.post('/user_keyword/like-news', { news: news })
+					.then(function (response) { })
+
 				like.disabled = 'true';
 			}
+
 			dislike.onclick = (e) => {
 				e.preventDefault();
-				axios.post('/user_keyword/dislike-news', { news: description.textContent })
-					.then(function (response) {
-						console.log(response);
-					})
-				console.log(`Disliked ${i}`)
-				console.log(description)
+				axios.post('/user_keyword/dislike-news', { news: news })
+					.then(function (response) { })
 				dislike.disabled = 'true';
 			}
 		}
